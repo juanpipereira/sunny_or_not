@@ -5,7 +5,11 @@ import 'package:sunny_or_not/features/weather/data/dtos/weather_dto.dart';
 import 'package:sunny_or_not/features/weather/data/dtos/weekly_weather_dto.dart';
 
 class WeatherRemoteDataSource implements IWeatherDataSource {
+  final http.Client client;
+
   static const String _baseUrl = 'https://api.open-meteo.com/v1/forecast';
+
+  WeatherRemoteDataSource({required this.client});
 
   @override
   Future<WeatherDTO> getCurrentWeather({
@@ -21,7 +25,7 @@ class WeatherRemoteDataSource implements IWeatherDataSource {
     );
 
     try {
-      final response = await http.get(url);
+      final response = await client.get(url);
 
       if (response.statusCode == 200) {
         return WeatherDTO.fromJson(jsonDecode(response.body));
@@ -49,7 +53,7 @@ class WeatherRemoteDataSource implements IWeatherDataSource {
       },
     );
     try {
-      final response = await http.get(url);
+      final response = await client.get(url);
 
       if (response.statusCode == 200) {
         return WeeklyWeatherDTO.fromJson(jsonDecode(response.body));
