@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sunny_or_not/di_setup.dart';
+import 'package:sunny_or_not/features/gps/presentation/bloc/gps_bloc.dart';
+import 'package:sunny_or_not/features/weather/presentation/blocs/weather_bloc.dart';
+import 'package:sunny_or_not/features/weather/presentation/screens/weather_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,10 +25,16 @@ class MainApp extends StatelessWidget {
         useMaterial3: true,
         colorSchemeSeed: Colors.blue,
       ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<GpsBloc>(
+            create: (_) => getIt<GpsBloc>(),
+          ),
+          BlocProvider<WeatherBloc>(
+            create: (_) => getIt<WeatherBloc>(),
+          ),
+        ],
+        child: const WeatherScreen(),
       ),
     );
   }

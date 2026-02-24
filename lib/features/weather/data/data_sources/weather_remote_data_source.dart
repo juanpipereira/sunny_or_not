@@ -18,9 +18,9 @@ class WeatherRemoteDataSource implements IWeatherDataSource {
   }) async {
     final url = Uri.parse(_baseUrl).replace(
       queryParameters: {
-        'latitude': latitude,
-        'longitude': longitude,
-        'current_weather': true,
+        'latitude': '$latitude',
+        'longitude': '$longitude',
+        'current_weather': 'true',
       },
     );
 
@@ -45,10 +45,10 @@ class WeatherRemoteDataSource implements IWeatherDataSource {
   }) async {
     final url = Uri.parse(_baseUrl).replace(
       queryParameters: {
-        'latitude': latitude,
-        'longitude': longitude,
+        'latitude': '$latitude',
+        'longitude': '$longitude',
         'daily': 'temperature_2m_max,temperature_2m_min,weathercode',
-        'forecast_days': 10,
+        'forecast_days': '10',
         'timezone': 'auto',
       },
     );

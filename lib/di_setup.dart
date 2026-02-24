@@ -1,7 +1,15 @@
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
+import 'package:sunny_or_not/features/gps/data/data_sources/gps_device_data_source.dart';
+import 'package:sunny_or_not/features/gps/data/data_sources/i_gps_device_data_source.dart';
+import 'package:sunny_or_not/features/gps/data/repositories/gps_repository.dart';
+import 'package:sunny_or_not/features/gps/domain/repositories/i_gps_repository.dart';
+import 'package:sunny_or_not/features/gps/domain/use_cases/get_current_gps_coordinates_use_case.dart';
+import 'package:sunny_or_not/features/gps/presentation/bloc/gps_bloc.dart';
+import 'package:sunny_or_not/features/weather/data/data_sources/i_weather_data_source.dart';
 import 'package:sunny_or_not/features/weather/data/data_sources/weather_remote_data_source.dart';
 import 'package:sunny_or_not/features/weather/data/repositories/weather_repository.dart';
+import 'package:sunny_or_not/features/weather/domain/repositories/i_weather_repository.dart';
 import 'package:sunny_or_not/features/weather/domain/use_cases/get_current_weather_use_case.dart';
 import 'package:sunny_or_not/features/weather/domain/use_cases/get_weekly_weather_use_case.dart';
 import 'package:sunny_or_not/features/weather/presentation/blocs/weather_bloc.dart';
@@ -24,14 +32,33 @@ Future<void> initGetIt() async {
   getIt.registerLazySingleton(() => GetWeeklyWeatherUseCase(getIt()));
 
   // Repository
-  getIt.registerLazySingleton<WeatherRepository>(
+  getIt.registerLazySingleton<IWeatherRepository>(
     () => WeatherRepository(getIt()),
   );
 
   // Data Source
-  getIt.registerLazySingleton(
+  getIt.registerLazySingleton<IWeatherDataSource>(
     () => WeatherRemoteDataSource(client: getIt()),
   );
+
+  // ---------------------------------------------------------------------------
+  // FEATURE: GPS
+  // --------------------------------------------------------------------------
+
+  // Bloc
+  getIt.registerFactory(() => GpsBloc(getGpsCoordinates: getIt()));
+
+  // Use Case
+  getIt.registerLazySingleton(() => GetCurrentCoordinatesUseCase(getIt()));
+
+  // Repository
+  getIt.registerLazySingleton<IGpsRepository>(
+    () => GpsRepository(getIt()),
+  );
+
+  // Data Source
+  getIt
+      .registerLazySingleton<IGpsDeviceDataSource>(() => GpsDeviceDataSource());
 
   // ---------------------------------------------------------------------------
   // EXTERNAL
