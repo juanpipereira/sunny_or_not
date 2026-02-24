@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sunny_or_not/di_setup.dart';
 import 'package:sunny_or_not/features/gps/presentation/bloc/gps_bloc.dart';
+import 'package:sunny_or_not/features/location/presentation/bloc/location_bloc.dart';
 import 'package:sunny_or_not/features/weather/presentation/blocs/weather_bloc.dart';
 import 'package:sunny_or_not/features/weather/presentation/screens/weather_screen.dart';
 
@@ -32,6 +33,9 @@ class MainApp extends StatelessWidget {
           ),
           BlocProvider<WeatherBloc>(
             create: (_) => getIt<WeatherBloc>(),
+          ),
+          BlocProvider<LocationBloc>(
+            create: (_) => getIt<LocationBloc>(),
           ),
         ],
         child: const WeatherScreen(),

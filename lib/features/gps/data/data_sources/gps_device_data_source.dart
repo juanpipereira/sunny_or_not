@@ -21,10 +21,6 @@ class GpsDeviceDataSource implements IGpsDeviceDataSource {
       throw Exception('Location permissions are permanently denied');
     }
 
-    return await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.medium,
-      ),
-    );
+    return await Geolocator.getCurrentPosition();
   }
 }

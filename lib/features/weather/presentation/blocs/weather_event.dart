@@ -10,12 +10,14 @@ sealed class WeatherEvent extends Equatable {
 final class WeatherFetchedByCoordinates extends WeatherEvent {
   final double latitude;
   final double longitude;
+  final String cityName;
 
   const WeatherFetchedByCoordinates({
     required this.latitude,
     required this.longitude,
+    required this.cityName,
   });
 
   @override
-  List<Object?> get props => [latitude, longitude];
+  List<Object?> get props => [latitude, longitude, cityName];
 }

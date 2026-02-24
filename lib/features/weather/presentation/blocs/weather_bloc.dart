@@ -38,6 +38,9 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
       emit(WeatherLoadSuccess(
         currentWeather: results[0] as CurrentWeather,
         forecast: results[1] as List<DailyWeather>,
+        latitude: event.latitude,
+        longitude: event.longitude,
+        cityName: event.cityName,
       ));
     } catch (e) {
       emit(const WeatherLoadFailure(
