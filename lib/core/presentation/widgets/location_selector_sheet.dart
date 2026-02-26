@@ -23,7 +23,9 @@ class LocationSelectorSheet extends StatelessWidget {
         ),
         BlocListener<GpsBloc, GpsState>(
           listener: (context, state) {
-            if (state is GpsLoadSuccess) Navigator.pop(context);
+            if (state is GpsLoadSuccess || state is GpsLoadFailure) {
+              Navigator.pop(context);
+            }
           },
         ),
       ],
@@ -34,66 +36,138 @@ class LocationSelectorSheet extends StatelessWidget {
               final bool isLoading = gpsState is GpsLoadInProgress ||
                   locationState is LocationLoadInProgress;
 
-              return Padding(
-                padding: EdgeInsets.only(
-                  left: 16,
-                  right: 16,
-                  top: 16,
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (gpsState is GpsLoadInProgress)
-                      const ListTile(
-                        leading: SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2)),
-                        title: Text('Fetching GPS...'),
-                      )
-                    else
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: 16.0,
+                    right: 16.0,
+                    top: 16.0,
+                    bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 4,
+                        margin: const EdgeInsets.only(bottom: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
                       ListTile(
-                        leading: const Icon(Icons.my_location),
-                        title: const Text('Use Current Location'),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        tileColor: Colors.blue.shade50,
+                        leading: gpsState is GpsLoadInProgress
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2))
+                            : Icon(Icons.my_location,
+                                color: Colors.blue.shade900),
+                        title: Text(
+                          gpsState is GpsLoadInProgress
+                              ? 'Fetching GPS...'
+                              : 'Use Current Location',
+                          style: TextStyle(
+                              color: Colors.blue.shade900,
+                              fontWeight: FontWeight.w500),
+                        ),
                         enabled: !isLoading,
                         onTap: () => context
                             .read<GpsBloc>()
                             .add(GpsCoordinatesRequested()),
                       ),
-                    const Divider(),
-                    TextField(
-                      controller: searchController,
-                      enabled: !isLoading,
-                      decoration: InputDecoration(
-                        hintText: 'Enter city name (e.g. London)',
-                        errorText: locationState is LocationLoadFailure
-                            ? locationState.message
-                            : null,
-                        border: const OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    if (locationState is LocationLoadInProgress)
-                      const CircularProgressIndicator()
-                    else
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: isLoading
-                              ? null
-                              : () {
-                                  final query = searchController.text.trim();
-                                  if (query.isNotEmpty) {
-                                    context
-                                        .read<LocationBloc>()
-                                        .add(LocationCitySearched(query));
-                                  }
-                                },
-                          child: const Text('Search City'),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        child: Row(
+                          children: [
+                            Expanded(child: Divider()),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: Text(
+                                "OR",
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                            Expanded(child: Divider()),
+                          ],
                         ),
                       ),
-                  ],
+                      TextField(
+                        controller: searchController,
+                        enabled: !isLoading,
+                        decoration: InputDecoration(
+                          hintText: 'Enter city name (e.g. London)',
+                          prefixIcon: const Icon(Icons.search),
+                          errorText: locationState is LocationLoadFailure
+                              ? locationState.message
+                              : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      if (locationState is LocationLoadInProgress)
+                        const CircularProgressIndicator()
+                      else
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            gradient: !isLoading
+                                ? LinearGradient(
+                                    colors: [
+                                      Colors.blue.shade300,
+                                      Colors.blue.shade600
+                                    ],
+                                  )
+                                : null,
+                            color: isLoading ? Colors.grey.shade400 : null,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: isLoading
+                                ? null
+                                : () {
+                                    final query = searchController.text.trim();
+                                    if (query.isNotEmpty) {
+                                      context
+                                          .read<LocationBloc>()
+                                          .add(LocationCitySearched(query));
+                                    }
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              disabledBackgroundColor: Colors.transparent,
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Search City',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               );
             },

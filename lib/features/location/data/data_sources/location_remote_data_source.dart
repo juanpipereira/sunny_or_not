@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:sunny_or_not/core/error/exceptions.dart';
 import 'package:sunny_or_not/features/location/data/data_sources/i_location_data_source.dart';
 import 'package:sunny_or_not/features/location/data/dtos/location_dto.dart';
 
@@ -31,15 +33,15 @@ class LocationRemoteDataSource implements ILocationDataSource {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
         if (data['results'] == null || (data['results'] as List).isEmpty) {
-          throw Exception('City not found');
+          throw EmptyResultException();
         }
 
         return LocationDTO.fromJson(data);
       } else {
-        throw Exception('Geocoding API Error: ${response.statusCode}');
+        throw ServerException();
       }
-    } catch (e) {
-      throw Exception('Network Error: $e');
+    } on SocketException {
+      throw NetworkException();
     }
   }
 }

@@ -9,6 +9,8 @@ import 'package:sunny_or_not/features/location/presentation/bloc/location_state.
 import 'package:sunny_or_not/features/weather/presentation/blocs/weather_bloc.dart';
 import 'package:sunny_or_not/features/weather/presentation/blocs/weather_event.dart';
 import 'package:sunny_or_not/features/weather/presentation/blocs/weather_state.dart';
+import 'package:sunny_or_not/features/weather/presentation/widgets/current_weather_card.dart';
+import 'package:sunny_or_not/features/weather/presentation/widgets/forecast_card.dart';
 
 class WeatherScreen extends StatelessWidget {
   const WeatherScreen({super.key});
@@ -17,6 +19,8 @@ class WeatherScreen extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
+      constraints: const BoxConstraints(maxWidth: double.infinity),
       builder: (_) => MultiBlocProvider(
         providers: [
           BlocProvider.value(value: context.read<GpsBloc>()),
@@ -46,6 +50,7 @@ class WeatherScreen extends StatelessWidget {
               Tab(text: '10 Days'),
             ],
           ),
+          centerTitle: true,
         ),
         body: MultiBlocListener(
           listeners: [
@@ -57,6 +62,11 @@ class WeatherScreen extends StatelessWidget {
                         longitude: state.gpsCoordinates.longitude,
                         cityName: 'Current Location',
                       ));
+                }
+                if (state is GpsLoadFailure) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(state.message)),
+                  );
                 }
               },
             ),
@@ -78,33 +88,49 @@ class WeatherScreen extends StatelessWidget {
                 child: BlocBuilder<WeatherBloc, WeatherState>(
                   builder: (context, state) {
                     return switch (state) {
-                      WeatherInitial() => const Text('Search or use GPS'),
+                      WeatherInitial() =>
+                        const Text('Search to see the weather'),
                       WeatherLoadInProgress() =>
                         const CircularProgressIndicator(),
-                      WeatherLoadFailure(message: var msg) =>
-                        Text('Error: $msg'),
+                      WeatherLoadFailure(message: var msg) => Text(msg),
                       WeatherLoadSuccess(
                         currentWeather: var currentWeather,
                         cityName: var cityName,
                         latitude: var latitude,
                         longitude: var longitude,
                       ) =>
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('Location: $cityName'),
-                            Text(
-                                '${currentWeather.temperature}°C - ${currentWeather.condition}'),
-                            const SizedBox(height: 20),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 16,
+                        OrientationBuilder(
+                          builder: (context, orientation) {
+                            final isLandscape =
+                                orientation == Orientation.landscape;
+
+                            return Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Flex(
+                                direction: isLandscape
+                                    ? Axis.horizontal
+                                    : Axis.vertical,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                spacing: 16.0,
+                                children: [
+                                  Expanded(
+                                    flex: 2,
+                                    child: MapViewer(
+                                      latitude: latitude,
+                                      longitude: longitude,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: CurrentWeatherCard(
+                                      currentWeather: currentWeather,
+                                      cityName: cityName,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              child: MapViewer(
-                                  latitude: latitude, longitude: longitude),
-                            ),
-                          ],
+                            );
+                          },
                         ),
                     };
                   },
@@ -114,20 +140,19 @@ class WeatherScreen extends StatelessWidget {
                 child: BlocBuilder<WeatherBloc, WeatherState>(
                   builder: (context, state) {
                     return switch (state) {
-                      WeatherInitial() => const Text('No forecast data yet'),
+                      WeatherInitial() =>
+                        const Text('Search to see the forecast'),
                       WeatherLoadInProgress() =>
                         const CircularProgressIndicator(),
-                      WeatherLoadFailure(message: var msg) =>
-                        Text('Error: $msg'),
-                      WeatherLoadSuccess(forecast: var list) =>
-                        SingleChildScrollView(
-                          child: Text(
-                            list
-                                .map((d) =>
-                                    '${d.date.day}/${d.date.month}: Max ${d.maxTemperature}° Min ${d.minTemperature}°')
-                                .join('\n\n'),
-                            textAlign: TextAlign.center,
-                          ),
+                      WeatherLoadFailure(message: var msg) => Text(msg),
+                      WeatherLoadSuccess(forecast: var forecastList) =>
+                        ListView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          itemCount: forecastList.length,
+                          itemBuilder: (context, index) {
+                            final day = forecastList[index];
+                            return ForecastCard(daily: day);
+                          },
                         ),
                     };
                   },

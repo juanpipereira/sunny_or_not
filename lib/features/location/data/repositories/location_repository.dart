@@ -1,3 +1,6 @@
+import 'package:fpdart/fpdart.dart';
+import 'package:sunny_or_not/core/error/exceptions.dart';
+import 'package:sunny_or_not/core/error/failures.dart';
 import 'package:sunny_or_not/features/location/data/data_sources/i_location_data_source.dart';
 import 'package:sunny_or_not/features/location/data/mappers/location_mapper.dart';
 import 'package:sunny_or_not/features/location/domain/entities/location.dart';
@@ -8,8 +11,18 @@ class LocationRepository implements ILocationRepository {
   LocationRepository(this.remoteDataSource);
 
   @override
-  Future<Location> getLocation(String cityName) async {
-    final locationDto = await remoteDataSource.searchCity(cityName);
-    return locationDto.toEntity();
+  Future<Either<Failure, Location>> getLocation(String cityName) async {
+    try {
+      final dto = await remoteDataSource.searchCity(cityName);
+      return Right(dto.toEntity());
+    } on EmptyResultException {
+      return const Left(LocationNotFoundFailure());
+    } on NetworkException {
+      return const Left(ConnectionFailure());
+    } on ServerException {
+      return const Left(ServerFailure());
+    } catch (_) {
+      return const Left(UnexpectedFailure());
+    }
   }
 }

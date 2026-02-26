@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:sunny_or_not/core/error/exceptions.dart';
 import 'package:sunny_or_not/features/weather/data/data_sources/i_weather_data_source.dart';
 import 'package:sunny_or_not/features/weather/data/dtos/weather_dto.dart';
 import 'package:sunny_or_not/features/weather/data/dtos/weekly_weather_dto.dart';
@@ -30,11 +32,10 @@ class WeatherRemoteDataSource implements IWeatherDataSource {
       if (response.statusCode == 200) {
         return WeatherDTO.fromJson(jsonDecode(response.body));
       } else {
-        throw Exception(
-            'Error fetching today\'s weather. API Status: ${response.statusCode}');
+        throw ServerException();
       }
-    } catch (e) {
-      throw Exception('Error fetching today\'s weather: $e');
+    } on SocketException {
+      throw NetworkException();
     }
   }
 
@@ -58,11 +59,10 @@ class WeatherRemoteDataSource implements IWeatherDataSource {
       if (response.statusCode == 200) {
         return WeeklyWeatherDTO.fromJson(jsonDecode(response.body));
       } else {
-        throw Exception(
-            'Error fetching weekly weather. API Status: ${response.statusCode}');
+        throw ServerException();
       }
-    } catch (e) {
-      throw Exception('Error fetching weekly weather: $e');
+    } on SocketException {
+      throw NetworkException();
     }
   }
 }
