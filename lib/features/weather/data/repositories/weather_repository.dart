@@ -1,3 +1,6 @@
+import 'package:fpdart/fpdart.dart';
+import 'package:sunny_or_not/core/error/exceptions.dart';
+import 'package:sunny_or_not/core/error/failures.dart';
 import 'package:sunny_or_not/features/weather/data/data_sources/i_weather_data_source.dart';
 import 'package:sunny_or_not/features/weather/data/mappers/weather_mapper.dart';
 import 'package:sunny_or_not/features/weather/data/mappers/weekly_weather_mapper.dart';
@@ -11,26 +14,42 @@ class WeatherRepository implements IWeatherRepository {
   WeatherRepository(this.remoteDataSource);
 
   @override
-  Future<CurrentWeather> getCurrentWeather({
+  Future<Either<Failure, CurrentWeather>> getCurrentWeather({
     required double latitude,
     required double longitude,
   }) async {
-    final weatherDTO = await remoteDataSource.getCurrentWeather(
-      latitude: latitude,
-      longitude: longitude,
-    );
-    return weatherDTO.toEntity();
+    try {
+      final weatherDTO = await remoteDataSource.getCurrentWeather(
+        latitude: latitude,
+        longitude: longitude,
+      );
+      return Right(weatherDTO.toEntity());
+    } on NetworkException {
+      return const Left(ConnectionFailure());
+    } on ServerException {
+      return const Left(ServerFailure());
+    } catch (_) {
+      return const Left(UnexpectedFailure());
+    }
   }
 
   @override
-  Future<List<DailyWeather>> getWeeklyWeather({
+  Future<Either<Failure, List<DailyWeather>>> getWeeklyWeather({
     required double latitude,
     required double longitude,
   }) async {
-    final weathersDTO = await remoteDataSource.getWeeklyWeather(
-      latitude: latitude,
-      longitude: longitude,
-    );
-    return weathersDTO.toEntity();
+    try {
+      final weathersDTO = await remoteDataSource.getWeeklyWeather(
+        latitude: latitude,
+        longitude: longitude,
+      );
+      return Right(weathersDTO.toEntity());
+    } on NetworkException {
+      return const Left(ConnectionFailure());
+    } on ServerException {
+      return const Left(ServerFailure());
+    } catch (_) {
+      return const Left(UnexpectedFailure());
+    }
   }
 }

@@ -18,11 +18,10 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   ) async {
     emit(LocationLoadInProgress());
 
-    try {
-      final location = await getLocation.execute(event.cityName);
-      emit(LocationLoadSuccess(location));
-    } catch (e) {
-      emit(LocationLoadFailure(e.toString()));
-    }
+    final result = await getLocation.execute(event.cityName);
+    result.fold(
+      (failure) => emit(LocationLoadFailure(failure.message)),
+      (location) => emit(LocationLoadSuccess(location)),
+    );
   }
 }

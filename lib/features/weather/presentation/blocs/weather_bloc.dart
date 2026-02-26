@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:sunny_or_not/core/error/failures.dart';
 import 'package:sunny_or_not/features/weather/domain/entities/current_weather.dart';
 import 'package:sunny_or_not/features/weather/domain/entities/daily_weather.dart';
 import 'package:sunny_or_not/features/weather/domain/use_cases/get_current_weather_use_case.dart';
@@ -23,28 +25,34 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
   ) async {
     emit(WeatherLoadInProgress());
 
-    try {
-      final results = await Future.wait([
-        getCurrentWeather.execute(
-          latitude: event.latitude,
-          longitude: event.longitude,
-        ),
-        getWeeklyWeather.execute(
-          latitude: event.latitude,
-          longitude: event.longitude,
-        ),
-      ]);
-
-      emit(WeatherLoadSuccess(
-        currentWeather: results[0] as CurrentWeather,
-        forecast: results[1] as List<DailyWeather>,
+    final results = await Future.wait([
+      getCurrentWeather.execute(
         latitude: event.latitude,
         longitude: event.longitude,
-        cityName: event.cityName,
-      ));
-    } catch (e) {
-      emit(const WeatherLoadFailure(
-          "We could not get weather data. Please try again"));
-    }
+      ),
+      getWeeklyWeather.execute(
+        latitude: event.latitude,
+        longitude: event.longitude,
+      ),
+    ]);
+
+    final currentResult = results[0] as Either<Failure, CurrentWeather>;
+    final weeklyResult = results[1] as Either<Failure, List<DailyWeather>>;
+
+    currentResult.fold(
+      (failure) => emit(WeatherLoadFailure(failure.message)),
+      (current) => weeklyResult.fold(
+        (failure) => emit(WeatherLoadFailure(failure.message)),
+        (weeklyWeather) => emit(
+          WeatherLoadSuccess(
+            currentWeather: current,
+            forecast: weeklyWeather,
+            latitude: event.latitude,
+            longitude: event.longitude,
+            cityName: event.cityName,
+          ),
+        ),
+      ),
+    );
   }
 }

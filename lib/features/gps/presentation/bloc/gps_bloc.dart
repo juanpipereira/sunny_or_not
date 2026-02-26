@@ -15,11 +15,11 @@ class GpsBloc extends Bloc<GpsEvent, GpsState> {
     Emitter<GpsState> emit,
   ) async {
     emit(GpsLoadInProgress());
-    try {
-      final coordinates = await getGpsCoordinates.execute();
-      emit(GpsLoadSuccess(coordinates));
-    } catch (e) {
-      emit(GpsLoadFailure(e.toString()));
-    }
+
+    final result = await getGpsCoordinates.execute();
+    result.fold(
+      (failure) => emit(GpsLoadFailure(failure.message)),
+      (coordinates) => emit(GpsLoadSuccess(coordinates)),
+    );
   }
 }
