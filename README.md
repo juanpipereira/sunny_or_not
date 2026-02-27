@@ -8,6 +8,7 @@
 *   **City Search:** Translates city names to coordinates to show weather data for any location.
 *   **10-Day Forecast:** Displays daily weather info (max/min temp) sourced from the [Open-Meteo API](https://open-meteo.com).
 *   **Map:** Visualizes the selected location on a map, providing geographical context for the current weather data.
+*   **Dark Theme:** Adapts the UI when the device switches to dark mode to ensure optimal readability in any mode.
 
 ## Core Dependencies
 
