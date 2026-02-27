@@ -35,6 +35,7 @@
 lib/
 ├── core/
 │   ├── error/              # Services exceptions and Domain failures
+│   ├── theme/              # Theme utilities
 │   └── presentation/       # Reusable or shared components
 └── features/
     ├── weather/            # Weather flow
@@ -60,11 +61,11 @@ Follow this steps to run the app
 ```text
 git clone https://github.com/juanpipereira/sunny_or_not.git
 ```
-3. Get dependencies
+2. Get dependencies
 ```text
 flutter pub get
 ```
-5. Run the app
+3. Run the app
 ```text
 flutter run
 ```

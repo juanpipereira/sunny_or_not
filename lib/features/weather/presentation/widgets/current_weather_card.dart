@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sunny_or_not/core/theme/gradient_theme.dart';
 import 'package:sunny_or_not/features/weather/domain/entities/current_weather.dart';
 import 'package:sunny_or_not/features/weather/presentation/mappers/weather_condition_ui_mapper.dart';
 
@@ -17,14 +18,7 @@ class CurrentWeatherCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.blue.shade300,
-            Colors.blue.shade600,
-          ],
-        ),
+        gradient: Theme.of(context).extension<GradientTheme>()?.mainGradient,
         borderRadius: BorderRadius.circular(20.0),
         boxShadow: [
           BoxShadow(
@@ -39,33 +33,33 @@ class CurrentWeatherCard extends StatelessWidget {
         children: [
           Icon(
             currentWeather.weatherCondition.getIcon,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
             size: 40,
           ),
           const SizedBox(height: 4),
           Text(
             cityName,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
             ),
           ),
           const SizedBox(height: 10),
           Text(
             '${currentWeather.temperature}°C',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 36,
               fontWeight: FontWeight.w300,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
             ),
           ),
           const SizedBox(height: 5),
           Text(
             currentWeather.weatherCondition.description,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: Colors.white70,
+              color: Theme.of(context).colorScheme.onSecondaryContainer,
               letterSpacing: 1.2,
             ),
           ),

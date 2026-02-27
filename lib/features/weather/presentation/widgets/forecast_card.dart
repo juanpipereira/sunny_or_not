@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sunny_or_not/core/theme/gradient_theme.dart';
 import 'package:sunny_or_not/features/weather/domain/entities/daily_weather.dart';
 import 'package:sunny_or_not/features/weather/presentation/mappers/weather_condition_ui_mapper.dart';
 
@@ -13,11 +14,7 @@ class ForecastCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.blue.shade300, Colors.blue.shade600],
-        ),
+        gradient: Theme.of(context).extension<GradientTheme>()?.mainGradient,
         borderRadius: BorderRadius.circular(15.0),
         boxShadow: [
           BoxShadow(
@@ -33,8 +30,8 @@ class ForecastCard extends StatelessWidget {
             width: 50,
             child: Text(
               '${daily.date.day}/${daily.date.month}',
-              style: const TextStyle(
-                  color: Colors.white,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                   fontSize: 16,
                   fontWeight: FontWeight.bold),
             ),
@@ -43,15 +40,15 @@ class ForecastCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             child: Icon(
               daily.weatherCondition.getIcon,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
               size: 28,
             ),
           ),
           Expanded(
             child: Text(
               daily.weatherCondition.description,
-              style: const TextStyle(
-                color: Colors.white70,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSecondaryContainer,
                 fontSize: 15,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -62,15 +59,18 @@ class ForecastCard extends StatelessWidget {
             children: [
               Text(
                 '${daily.maxTemperature}°',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
               ),
               Text(
                 '${daily.minTemperature}°',
-                style: const TextStyle(color: Colors.white70, fontSize: 12),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
