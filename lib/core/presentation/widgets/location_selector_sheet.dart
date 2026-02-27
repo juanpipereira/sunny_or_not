@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sunny_or_not/core/theme/gradient_theme.dart';
 import 'package:sunny_or_not/features/gps/presentation/bloc/gps_bloc.dart';
 import 'package:sunny_or_not/features/gps/presentation/bloc/gps_event.dart';
 import 'package:sunny_or_not/features/gps/presentation/bloc/gps_state.dart';
@@ -127,12 +128,9 @@ class LocationSelectorSheet extends StatelessWidget {
                           width: double.infinity,
                           decoration: BoxDecoration(
                             gradient: !isLoading
-                                ? LinearGradient(
-                                    colors: [
-                                      Colors.blue.shade300,
-                                      Colors.blue.shade600
-                                    ],
-                                  )
+                                ? Theme.of(context)
+                                    .extension<GradientTheme>()
+                                    ?.mainGradient
                                 : null,
                             color: isLoading ? Colors.grey.shade400 : null,
                             borderRadius: BorderRadius.circular(12),
@@ -156,10 +154,12 @@ class LocationSelectorSheet extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Search City',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
